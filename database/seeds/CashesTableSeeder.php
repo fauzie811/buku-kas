@@ -2,6 +2,7 @@
 
 use App\Cash;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 
 class CashesTableSeeder extends Seeder
 {
@@ -12,6 +13,8 @@ class CashesTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Cash::class, 150)->create();
+        if (App::environment('local')) {
+            factory(Cash::class, 150)->create();
+        }
     }
 }

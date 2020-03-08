@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class Cash extends Model
@@ -21,15 +22,28 @@ class Cash extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('order', function(Builder $builder) {
+        static::addGlobalScope('order', function (Builder $builder) {
             $builder->orderBy('date', 'desc')->orderBy('id', 'desc');
         });
 
-        static::saved(function() {
+        static::created(function ($item) {
+            $user = Auth::user();
+            Log::create([
+                'user_id' => $user ? $user->id : 2,
+                'action' => $item->cash_type->type === 'in' ? 'cash_in' : 'cash_out',
+                'details' => [
+                    'id' => $item->id,
+                    'date' => $item->date->format('Y-m-d'),
+                    'description' => $item->description,
+                    'amount' => $item->amount,
+                ],
+            ]);
+        });
+        static::saved(function () {
             Cache::forget('cash_in_total');
             Cache::forget('cash_out_total');
         });
-        static::deleted(function() {
+        static::deleted(function () {
             Cache::forget('cash_in_total');
             Cache::forget('cash_out_total');
         });

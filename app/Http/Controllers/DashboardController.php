@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Cash;
+use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,10 @@ class DashboardController extends Controller
            })->get()->sum('amount');
         });
         $balance = $cash_in_total - $cash_out_total;
-        return view('dashboard', compact('cash_in_total', 'cash_out_total', 'balance'));
+
+        $logs = Log::with('user')->take(5)->get();
+
+        return view('dashboard', compact('cash_in_total', 'cash_out_total', 'balance', 'logs'));
     }
 
     public function lastYearChart()
@@ -47,12 +51,12 @@ class DashboardController extends Controller
         foreach ($months as $m) {
             $rows[] = [
                 'month' => $m,
-                'cash_in' => 0,
-                'cash_out' => 0,
+                'cash_in' => "0",
+                'cash_out' => "0",
             ];
         }
         array_map(function($item) use (&$rows, $months) {
-            $rows[intval($item->month) - 1]['cash_in'] = intval($item->total_amount);
+            $rows[intval($item->month) - 1]['cash_in'] = $item->total_amount;
         }, DB::table('cashes')
             ->join('cash_types', 'cashes.cash_type_id', '=', 'cash_types.id')
             ->select(
@@ -65,7 +69,7 @@ class DashboardController extends Controller
             ->orderBy('month', 'asc')
             ->get()->toArray());
         array_map(function($item) use (&$rows, $months) {
-            $rows[intval($item->month) - 1]['cash_out'] = intval($item->total_amount);
+            $rows[intval($item->month) - 1]['cash_out'] = $item->total_amount;
         }, DB::table('cashes')
             ->join('cash_types', 'cashes.cash_type_id', '=', 'cash_types.id')
             ->select(

@@ -33,10 +33,33 @@
         </div>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header">Laporan Kas Tahun Lalu</div>
-        <div class="card-body">
-            <div class="chart" id="last-year-chart" style="height: 300px;"></div>
+    <div class="row mt-4">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header">Laporan Kas Tahun {{ date('Y', strtotime('-1 year')) }}</div>
+                <div class="card-body">
+                    <div class="chart" id="last-year-chart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">Log Aktivitas</div>
+                <div>
+                    <ul class="timeline">
+                        @foreach ($logs as $log)
+                        <li class="{{ $log->color }}">
+                            <strong>{{ $log->user->name }}</strong> {{ $log->description }}<br>
+                            @if ($log->details)
+                            <a href="{{ route('cashes.show', $log->details['id']) }}"><small>{{ $log->details_str }}</small></a>
+                            @endif
+                            <div class="text-muted"><small><i class="far fa-clock"></i>
+                                    {{ $log->created_at->format('Y-m-d H:i:s') }}</small></div>
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -55,15 +78,17 @@
 			if (results.length == 0) {
 				$("#last-year-chart").html('<span>Tidak ada transaksi</span>');
 			} else {
-				new Morris.Bar({
+				new Morris.Line({
 					element: 'last-year-chart',
 					resize: true,
 					data: results,
-					barColors: ['#38c172', '#e3342f'],
+					lineColors: ['#38c172', '#e3342f'],
 					xkey: 'month',
 					ykeys: ['cash_in', 'cash_out'],
 					labels: ['Kas Masuk', 'Kas Keluar'],
-					hideHover: 'auto'
+                    hideHover: 'auto',
+                    parseTime: false,
+                    preUnits: 'Rp ',
 				});
 			}
 	    })

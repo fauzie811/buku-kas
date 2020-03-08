@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Log;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -70,5 +71,15 @@ class LoginController extends Controller
     public function username()
     {
         return $this->username;
+    }
+
+    protected function authenticated(\Illuminate\Http\Request $request, $user)
+    {
+        if ($user->role !== 'admin') {
+            Log::create([
+                'user_id' => $user->id,
+                'action' => 'login',
+            ]);
+        }
     }
 }

@@ -16871,3 +16871,47 @@ body {
   }
 }
 
+ul.timeline {
+  font-size: 0.85rem;
+  list-style-type: none;
+  position: relative;
+}
+
+ul.timeline:before {
+  content: " ";
+  background: #d4d9df;
+  display: inline-block;
+  position: absolute;
+  left: 1.45rem;
+  width: 2px;
+  height: 100%;
+  z-index: 400;
+}
+
+ul.timeline > li {
+  margin: 1rem 0;
+  padding: 0 1rem;
+}
+
+ul.timeline > li:before {
+  content: " ";
+  background: white;
+  display: inline-block;
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid #3490dc;
+  left: 1rem;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.2rem;
+  z-index: 400;
+}
+
+ul.timeline > li.red:before {
+  border-color: #e3342f;
+}
+
+ul.timeline > li.green:before {
+  border-color: #38c172;
+}
+
