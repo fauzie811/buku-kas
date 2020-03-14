@@ -88,7 +88,7 @@
 					labels: ['Kas Masuk', 'Kas Keluar'],
                     hideHover: 'auto',
                     parseTime: false,
-                    preUnits: 'Rp ',
+                    // preUnits: 'Rp ',
 				});
 			}
 	    })
