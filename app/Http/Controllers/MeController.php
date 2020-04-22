@@ -48,7 +48,7 @@ class MeController extends Controller
     public function savePassword(Request $request)
     {
         $this->validate($request, [
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed'],
         ]);
 
         $user = Auth::user();
