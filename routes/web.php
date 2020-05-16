@@ -27,3 +27,4 @@ Route::post('profile/change-password', 'MeController@savePassword');
 Route::resource('cash-types', 'CashTypeController');
 Route::get('cashes/excel', 'CashController@excel')->name('cashes.excel');
 Route::resource('cashes', 'CashController');
+Route::resource('cashbooks', 'CashbookController');

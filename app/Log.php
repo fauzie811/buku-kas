@@ -5,6 +5,20 @@ namespace App;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Log
+ *
+ * @property integer $id
+ * @property integer $user_id
+ * @property string $action
+ * @property array $details
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property-read string $description
+ * @property-read string $details_str
+ * @property-read string $color
+ * @property-read User $user
+ */
 class Log extends Model
 {
     protected $fillable = ['user_id', 'action', 'details'];
@@ -21,7 +35,7 @@ class Log extends Model
             $builder->orderBy('created_at', 'desc')->orderBy('id', 'desc');
         });
     }
-    
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -33,8 +47,14 @@ class Log extends Model
             case 'login':
                 return 'melakukan login';
             case 'cash_in':
-                return 'membuat kas masuk';
+                if (isset($this->details['cashbook'])) {
+                    return "membuat kas masuk di {$this->details['cashbook']}";
+                }
+                return "membuat kas masuk";
             case 'cash_out':
+                if (isset($this->details['cashbook'])) {
+                    return "membuat kas keluar di {$this->details['cashbook']}";
+                }
                 return 'membuat kas keluar';
             default:
                 return '';

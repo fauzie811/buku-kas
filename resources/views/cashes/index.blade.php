@@ -20,7 +20,7 @@
                                             <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                         </div>
                                         <input type="text" class="form-control" name="date_start" id="date_start"
-                                            value={{ $date_start ?? '' }} autocomplete="off" data-provide="datepicker">
+                                            value={{ $date_start ? $date_start : '' }} autocomplete="off" data-provide="datepicker">
                                     </div>
                                 </div>
                             </div>
@@ -32,15 +32,30 @@
                                             <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                         </div>
                                         <input type="text" class="form-control" name="date_end" id="date_end"
-                                            value={{ $date_end ?? '' }} autocomplete="off" data-provide="datepicker">
+                                            value={{ $date_end ? $date_end : '' }} autocomplete="off" data-provide="datepicker">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="description">Keterangan</label>
-                            <input type="text" name="description" id="description" class="form-control"
-                                value="{{ $description ?? '' }}">
+                        <div class="form-row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="cashbook_id">Buku Kas</label>
+                                    <select name="cashbook_id" id="cashbook_id" class="form-control">
+                                        <option value="">-- Semua Buku Kas --</option>
+                                        @foreach ($cashbooks as $cashbook)
+                                        <option value="{{ $cashbook->id }}"{{ $cashbook->id == $cashbook_id ? ' selected' : '' }}>{{ $cashbook->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label for="description">Keterangan</label>
+                                    <input type="text" name="description" id="description" class="form-control"
+                                        value="{{ $description ? $description : '' }}">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-row">
                             <div class="col-sm">
@@ -72,6 +87,16 @@
                                             class="form-control" value="{{ date('Y-m-d') }}"
                                             autocomplete="off" data-provide="datepicker">
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="form-group">
+                                    <label for="cashbook_id">Buku Kas</label>
+                                    <select name="cashbook_id" id="cashbook_id" class="form-control">
+                                        @foreach ($cashbooks as $cashbook)
+                                        <option value="{{ $cashbook->id }}">{{ $cashbook->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-sm">
@@ -186,16 +211,17 @@
         <div class="card-body">
             @if (sizeof($cashes) > 0)
             <div class="text-right">
-                <a href="{{ route('cashes.excel') }}?date_start={{ $date_start }}&date_end={{ $date_end }}&description={{ $description }}"
+                <a href="{{ route('cashes.excel') }}?cashbook_id={{ $cashbook_id }}&date_start={{ $date_start }}&date_end={{ $date_end }}&description={{ $description }}"
                     class="btn btn-success">
                     <i class="far fa-file-excel"></i> XLSX
                 </a>
             </div>
-            <table class="table mt-3">
+            <table class="table table-sm mt-3">
                 <thead>
                     <tr>
                         <th>No</th>
                         <th>Tanggal</th>
+                        <th>Kas</th>
                         <th>Jenis</th>
                         <th>Keterangan</th>
                         <th class="text-nowrap text-right">Kas Masuk</th>
@@ -207,7 +233,8 @@
                     @foreach ($cashes as $cash)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td class="text-nowrap">{{ $cash->date }}</td>
+                        <td class="text-nowrap">{{ $cash->date->format('Y-m-d') }}</td>
+                        <td>{{ $cash->cashbook->name }}</td>
                         <td>
                             <strong class="text-nowrap">{{ $cash->cash_type->type_str }}</strong>:<br>
                             <span class="text-nowrap">{{ $cash->cash_type->description }}</span>
@@ -261,7 +288,7 @@
 <script>
     jQuery(document).ready(function($) {
         $('.delete-form').submit(function(event) {
-            if( !confirm('Hapus data ini?') ) 
+            if( !confirm('Hapus data ini?') )
                 event.preventDefault();
         })
         // $('#date_start').datepicker({

@@ -17,7 +17,7 @@ class CreateLogsTable extends Migration
             $table->increments('id');
             $table->unsignedBigInteger('user_id')->default(1);
             $table->string('action');
-            $table->json('details')->nullable();
+            $table->string('details')->nullable();
             $table->timestamps();
         });
     }

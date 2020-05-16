@@ -17,8 +17,9 @@ class CreateCashesTable extends Migration
     {
         Schema::create('cashes', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('cashbook_id')->default(1);
             $table->date('date')->default(Carbon::now());
-            $table->unsignedBigInteger('cash_type_id');
+            $table->unsignedInteger('cash_type_id');
             $table->text('description')->nullable();
             $table->unsignedBigInteger('amount')->default(0);
             $table->timestamps();

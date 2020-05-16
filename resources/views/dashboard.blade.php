@@ -7,42 +7,51 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-sm">
-            <div class="card text-white bg-primary">
+        <div class="col-lg">
+            <div class="card mb-4 text-white bg-primary">
                 <div class="card-header">Saldo Akhir</div>
                 <div class="card-body">
-                    <div class="h1 text-right">{{ rupiah($balance) }}</div>
+                    @foreach ($stats as $stat)
+                        <div>{{ $stat['cashbook'] }}</div>
+                        <div class="h1 text-right">{{ rupiah($stat['balance']) }}</div>
+                    @endforeach
                 </div>
             </div>
         </div>
-        <div class="col-sm">
-            <div class="card text-white bg-success">
+        <div class="col-lg">
+            <div class="card mb-4 text-white bg-success">
                 <div class="card-header">Total Kas Masuk</div>
                 <div class="card-body">
-                    <div class="h1 text-right">{{ rupiah($cash_in_total) }}</div>
+                    @foreach ($stats as $stat)
+                        <div>{{ $stat['cashbook'] }}</div>
+                        <div class="h1 text-right">{{ rupiah($stat['cash_in_total']) }}</div>
+                    @endforeach
                 </div>
             </div>
         </div>
-        <div class="col-sm">
-            <div class="card text-white bg-danger">
+        <div class="col-lg">
+            <div class="card mb-4 text-white bg-danger">
                 <div class="card-header">Total Kas Keluar</div>
                 <div class="card-body">
-                    <div class="h1 text-right">{{ rupiah($cash_out_total) }}</div>
+                    @foreach ($stats as $stat)
+                        <div>{{ $stat['cashbook'] }}</div>
+                        <div class="h1 text-right">{{ rupiah($stat['cash_out_total']) }}</div>
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row mt-4">
-        <div class="col-8">
-            <div class="card">
+        <div class="col-lg-8">
+            <div class="card mb-4">
                 <div class="card-header">Laporan Kas Tahun {{ date('Y', strtotime('-1 year')) }}</div>
                 <div class="card-body">
                     <div class="chart" id="last-year-chart" style="height: 300px;"></div>
                 </div>
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">Log Aktivitas</div>
                 <div>

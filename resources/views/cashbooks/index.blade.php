@@ -5,20 +5,13 @@
     <div class="row">
         <div class="col-lg-3">
             <div class="card mb-4">
-                <div class="card-header">Tambah Jenis Kas</div>
+                <div class="card-header">Tambah Buku Kas</div>
                 <div class="card-body">
-                    <form action="{{ route('cash-types.store') }}" method="POST">
+                    <form action="{{ route('cashbooks.store') }}" method="POST">
                         {{ csrf_field() }}
                         <div class="form-group">
-                            <label for="type">Jenis</label>
-                            <select name="type" id="type" class="form-control">
-                                <option value="in">Kas Masuk</option>
-                                <option value="out">Kas Keluar</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Keterangan</label>
-                            <input type="text" name="description" id="description" class="form-control" required>
+                            <label for="name">Keterangan</label>
+                            <input type="text" name="name" id="name" class="form-control" required>
                         </div>
                         <button type="submit" class="btn btn-success btn-block">Tambah</button>
                     </form>
@@ -27,36 +20,36 @@
         </div>
         <div class="col-lg-9">
             <div class="card">
-                <div class="card-header">Jenis Kas</div>
+                <div class="card-header">Buku Kas</div>
                 <div class="card-body">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Jenis</th>
                                 <th>Keterangan</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($cash_types as $cash_type)
+                            @foreach ($cashbooks as $cashbook)
                             <tr>
-                                <td>{{ $cash_type->id }}</td>
-                                <td>{{ $cash_type->type === 'in' ? 'Kas Masuk' : 'Kas Keluar' }}</td>
-                                <td>{{ $cash_type->description }}</td>
+                                <td>{{ $cashbook->id }}</td>
+                                <td>{{ $cashbook->name }}</td>
                                 <td class="text-right">
-                                    <a href="{{ route('cash-types.edit', $cash_type->id) }}"
+                                    <a href="{{ route('cashbooks.edit', $cashbook->id) }}"
                                         class="btn btn-sm btn-warning" title="Edit">
                                         <i class="far fa-edit"></i>
                                     </a>
+                                    @can('admin')
                                     <form class="delete-form d-inline-block"
-                                        action="{{ route('cash-types.destroy', $cash_type->id) }}" method="post">
+                                        action="{{ route('cashbooks.destroy', $cashbook->id) }}" method="post">
                                         {{ csrf_field() }}
                                         <input type="hidden" name="_method" value="DELETE">
                                         <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
                                             <i class="far fa-trash-alt"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                             @endforeach

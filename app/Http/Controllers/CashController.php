@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Cash;
+use App\Cashbook;
 use App\CashType;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -27,6 +28,7 @@ class CashController extends Controller
      */
     public function index(Request $request)
     {
+        $cashbook_id = $request->query('cashbook_id');
         $date_start = $request->query('date_start');
         $date_end = $request->query('date_end');
         $description = $request->query('description');
@@ -38,14 +40,20 @@ class CashController extends Controller
             $date_end = date('Y-m-d');
         }
 
-        $query = Cash::with('cash_type')
+        $query = Cash::with(['cashbook', 'cash_type'])
             ->whereBetween('date', [$date_start, $date_end]);
 
         if (!empty($description)) {
             $query->where('description', 'LIKE', '%' . $description . '%');
         }
 
+        if (!empty($cashbook_id)) {
+            $query->where('cashbook_id', $cashbook_id);
+        }
+
         $cashes = $query->get();
+
+        $cashbooks = Cashbook::all();
 
         $cash_types_in = CashType::where('type', 'in')->get();
         $cash_types_out = CashType::where('type', 'out')->get();
@@ -74,7 +82,7 @@ class CashController extends Controller
         return view(
             'cashes.index',
             compact([
-                'date_start', 'date_end', 'description', 'cashes', 'cash_in_totals', 'cash_out_totals',
+                'cashbook_id', 'date_start', 'date_end', 'description', 'cashes', 'cashbooks', 'cash_in_totals', 'cash_out_totals',
                 'cash_in_total', 'cash_out_total', 'cash_types_in', 'cash_types_out',
             ])
         );
@@ -99,13 +107,14 @@ class CashController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
+            'cashbook_id' => ['required', 'exists:cashbooks,id'],
             'date' => ['nullable', 'date'],
             'cash_type_id' => ['required', 'exists:cash_types,id'],
             'amount' => ['required', 'numeric'],
             'description' => ['nullable', 'string'],
         ]);
 
-        Cash::create($request->only(['date', 'cash_type_id', 'amount', 'description']));
+        Cash::create($request->only(['cashbook_id', 'date', 'cash_type_id', 'amount', 'description']));
 
         return redirect()->route('cashes.index');
     }
@@ -129,10 +138,11 @@ class CashController extends Controller
      */
     public function edit(Cash $cash)
     {
+        $cashbooks = Cashbook::all();
         $cash_types_in = CashType::where('type', 'in')->get();
         $cash_types_out = CashType::where('type', 'out')->get();
 
-        return view('cashes.edit', compact('cash', 'cash_types_in', 'cash_types_out'));
+        return view('cashes.edit', compact('cash', 'cashbooks', 'cash_types_in', 'cash_types_out'));
     }
 
     /**
@@ -145,13 +155,14 @@ class CashController extends Controller
     public function update(Request $request, Cash $cash)
     {
         $this->validate($request, [
+            'cashbook_id' => ['nullable', 'exists:cashbooks,id'],
             'date' => ['nullable', 'date'],
             'cash_type_id' => ['nullable', 'exists:cash_types,id'],
             'amount' => ['nullable', 'numeric'],
             'description' => ['nullable', 'string'],
         ]);
 
-        $cash->update($request->only(['date', 'cash_type_id', 'amount', 'description']));
+        $cash->update($request->only(['cashbook_id', 'date', 'cash_type_id', 'amount', 'description']));
 
         return redirect()->route('cashes.index');
     }
@@ -171,6 +182,7 @@ class CashController extends Controller
 
     public function excel(Request $request)
     {
+        $cashbook_id = $request->query('cashbook_id');
         $date_start = $request->query('date_start');
         $date_end = $request->query('date_end');
         $description = $request->query('description');
@@ -189,12 +201,16 @@ class CashController extends Controller
             $query->where('description', 'LIKE', '%' . $description . '%');
         }
 
+        if (!empty($cashbook_id)) {
+            $query->where('cashbook_id', $cashbook_id);
+        }
+
         $cashes = $query->get();
 
         $filename = "Laporan Kas $date_start - $date_end";
         Excel::create($filename, function ($excel) use ($filename, $cashes) {
             $excel->setTitle($filename);
-            
+
             $excel->sheet('Sheet1', function ($sheet) use ($cashes) {
                 $sheet->setAutoSize(false);
                 $data = [];
