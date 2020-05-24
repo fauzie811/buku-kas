@@ -1,10 +1,26 @@
 @extends('layouts.app')
 
+<?php
+function appendUrlParams($data = [])
+{
+    parse_str($_SERVER['QUERY_STRING'], $old_data);
+    $data = array_merge($old_data, $data);
+    return http_build_query($data);
+}
+?>
+
 @section('content')
 <div class="container">
     @if($errors->any())
     {!! implode('', $errors->all('<div class="alert alert-danger" role="alert">:message</div>')) !!}
     @endif
+    <ul class="nav nav-pills nav-fill mb-4">
+        @foreach ($cashbooks as $cb)
+        <li class="nav-item">
+            <a href="{{ route('cashes.index') }}?{{ appendUrlParams(['cashbook_id' => $cb->id]) }}" class="nav-link{{ $cb->id == $cashbook_id ? ' active' : '' }}">{{ $cb->name }}</a>
+        </li>
+        @endforeach
+    </ul>
     <div class="row">
         <div class="col-sm">
             <div class="card">
@@ -37,32 +53,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="cashbook_id">Buku Kas</label>
-                                    <select name="cashbook_id" id="cashbook_id" class="form-control">
-                                        <option value="">-- Semua Buku Kas --</option>
-                                        @foreach ($cashbooks as $cashbook)
-                                        <option value="{{ $cashbook->id }}"{{ $cashbook->id == $cashbook_id ? ' selected' : '' }}>{{ $cashbook->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-8">
-                                <div class="form-group">
-                                    <label for="description">Keterangan</label>
-                                    <input type="text" name="description" id="description" class="form-control"
-                                        value="{{ $description ? $description : '' }}">
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label for="description">Keterangan</label>
+                            <input type="text" name="description" id="description" class="form-control"
+                                value="{{ $description ? $description : '' }}">
                         </div>
                         <div class="form-row">
                             <div class="col-sm">
                                 <button type="submit" class="btn btn-block btn-primary">Cari</button>
                             </div>
                             <div class="col-sm">
-                                <a href="{{ route('cashes.index') }}" class="btn btn-light btn-block">Reset</a>
+                                <a href="{{ route('cashes.index') }}?cashbook_id={{ $cashbook_id }}" class="btn btn-light btn-block">Reset</a>
                             </div>
                         </div>
                     </form>
@@ -87,16 +88,6 @@
                                             class="form-control" value="{{ date('Y-m-d') }}"
                                             autocomplete="off" data-provide="datepicker">
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-sm">
-                                <div class="form-group">
-                                    <label for="cashbook_id">Buku Kas</label>
-                                    <select name="cashbook_id" id="cashbook_id" class="form-control">
-                                        @foreach ($cashbooks as $cashbook)
-                                        <option value="{{ $cashbook->id }}">{{ $cashbook->name }}</option>
-                                        @endforeach
-                                    </select>
                                 </div>
                             </div>
                             <div class="col-sm">
@@ -221,7 +212,6 @@
                     <tr>
                         <th>No</th>
                         <th>Tanggal</th>
-                        <th>Kas</th>
                         <th>Jenis</th>
                         <th>Keterangan</th>
                         <th class="text-nowrap text-right">Kas Masuk</th>
@@ -234,7 +224,6 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td class="text-nowrap">{{ $cash->date->format('Y-m-d') }}</td>
-                        <td>{{ $cash->cashbook->name }}</td>
                         <td>
                             <strong class="text-nowrap">{{ $cash->cash_type->type_str }}</strong>:<br>
                             <span class="text-nowrap">{{ $cash->cash_type->description }}</span>

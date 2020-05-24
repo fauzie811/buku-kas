@@ -33,6 +33,9 @@ class CashController extends Controller
         $date_end = $request->query('date_end');
         $description = $request->query('description');
 
+        if ($cashbook_id === null) {
+            $cashbook_id = 1;
+        }
         if ($date_start === null) {
             $date_start = date('Y-m-01');
         }
@@ -201,17 +204,20 @@ class CashController extends Controller
             $query->where('description', 'LIKE', '%' . $description . '%');
         }
 
-        if (!empty($cashbook_id)) {
-            $query->where('cashbook_id', $cashbook_id);
-        }
+        $query->where('cashbook_id', $cashbook_id);
 
         $cashes = $query->get();
 
-        $filename = "Laporan Kas $date_start - $date_end";
-        Excel::create($filename, function ($excel) use ($filename, $cashes) {
+        /**
+         * @var \App\Cashbook $cashbook
+         */
+        $cashbook = Cashbook::find($cashbook_id);
+
+        $filename = "Laporan Kas ({$cashbook->name}) $date_start - $date_end";
+        Excel::create($filename, function ($excel) use ($filename, $cashes, $cashbook) {
             $excel->setTitle($filename);
 
-            $excel->sheet('Sheet1', function ($sheet) use ($cashes) {
+            $excel->sheet($cashbook->name, function ($sheet) use ($cashes) {
                 $sheet->setAutoSize(false);
                 $data = [];
                 foreach ($cashes as $cash) {
