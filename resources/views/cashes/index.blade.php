@@ -76,6 +76,7 @@ function appendUrlParams($data = [])
                 <div class="card-body">
                     <form action="{{ route('cashes.store') }}" method="POST">
                         {{ csrf_field() }}
+                        <input type="hidden" name="cashbook_id" value="{{ $cashbook_id }}">
                         <div class="form-row">
                             <div class="col-sm">
                                 <div class="form-group">

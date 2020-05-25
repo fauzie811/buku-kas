@@ -119,7 +119,7 @@ class CashController extends Controller
 
         Cash::create($request->only(['cashbook_id', 'date', 'cash_type_id', 'amount', 'description']));
 
-        return redirect()->route('cashes.index');
+        return redirect()->back();
     }
 
     /**
