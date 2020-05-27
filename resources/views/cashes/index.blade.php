@@ -217,11 +217,22 @@ function appendUrlParams($data = [])
                         <th>Keterangan</th>
                         <th class="text-nowrap text-right">Kas Masuk</th>
                         <th class="text-nowrap text-right">Kas Keluar</th>
+                        @if(empty($description))
+                        <th class="text-nowrap text-right">Saldo</th>
+                        @endif
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php $last_balance = $old_balance; ?>
                     @foreach ($cashes as $cash)
+                    <?php
+                    if ($cash->cash_type->type === 'in') {
+                        $last_balance += $cash->amount;
+                    } else {
+                        $last_balance -= $cash->amount;
+                    }
+                    ?>
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td class="text-nowrap">{{ $cash->date->format('Y-m-d') }}</td>
@@ -234,6 +245,9 @@ function appendUrlParams($data = [])
                             {{ $cash->cash_type->type === 'in' ? $cash->amount_str : '' }}</td>
                         <td class="text-right text-nowrap">
                             {{ $cash->cash_type->type === 'out' ? $cash->amount_str : '' }}</td>
+                        @if(empty($description))
+                        <td class="text-nowrap text-right">{{ rupiah($last_balance) }}</td>
+                        @endif
                         <td class="text-right text-nowrap">
                             <a href="{{ route('cashes.edit', $cash->id) }}" class="btn btn-sm btn-warning"><i
                                     class="far fa-edit"></i></a>

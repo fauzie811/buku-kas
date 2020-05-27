@@ -44,17 +44,24 @@ class CashController extends Controller
         }
 
         $query = Cash::with(['cashbook', 'cash_type'])
+            ->where('cashbook_id', $cashbook_id)
             ->whereBetween('date', [$date_start, $date_end]);
 
         if (!empty($description)) {
             $query->where('description', 'LIKE', '%' . $description . '%');
         }
 
-        if (!empty($cashbook_id)) {
-            $query->where('cashbook_id', $cashbook_id);
-        }
-
         $cashes = $query->get();
+
+        $old_date_start = '2019-01-01';
+        $old_date_end = date('Y-m-d', strtotime('-1 day', strtotime($date_start)));
+        $old_cashes_in = Cash::whereHas('cash_type', function($q) {
+            $q->where('type', 'in');
+        })->where('cashbook_id', $cashbook_id)->whereBetween('date', [$old_date_start, $old_date_end])->get();
+        $old_cashes_out = Cash::whereHas('cash_type', function($q) {
+            $q->where('type', 'out');
+        })->where('cashbook_id', $cashbook_id)->whereBetween('date', [$old_date_start, $old_date_end])->get();
+        $old_balance = $old_cashes_in->sum('amount') - $old_cashes_out->sum('amount');
 
         $cashbooks = Cashbook::all();
 
@@ -86,7 +93,7 @@ class CashController extends Controller
             'cashes.index',
             compact([
                 'cashbook_id', 'date_start', 'date_end', 'description', 'cashes', 'cashbooks', 'cash_in_totals', 'cash_out_totals',
-                'cash_in_total', 'cash_out_total', 'cash_types_in', 'cash_types_out',
+                'cash_in_total', 'cash_out_total', 'cash_types_in', 'cash_types_out', 'old_balance',
             ])
         );
     }

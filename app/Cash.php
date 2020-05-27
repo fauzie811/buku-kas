@@ -43,7 +43,7 @@ class Cash extends Model
         parent::boot();
 
         static::addGlobalScope('order', function (Builder $builder) {
-            $builder->orderBy('date', 'desc')->orderBy('id', 'desc');
+            $builder->orderBy('date', 'asc')->orderBy('id', 'asc');
         });
 
         static::created(function (Cash $item) {
