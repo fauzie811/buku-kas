@@ -27,6 +27,7 @@ function appendUrlParams($data = [])
                 <div class="card-header">Pencarian</div>
                 <div class="card-body">
                     <form action="{{ route('cashes.index') }}" method="GET">
+                        <input type="hidden" name="cashbook_id" value="{{ $cashbook_id }}">
                         <div class="form-row">
                             <div class="col-sm">
                                 <div class="form-group">
