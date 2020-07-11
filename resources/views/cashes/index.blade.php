@@ -250,7 +250,7 @@ function appendUrlParams($data = [])
                         <td class="text-nowrap text-right">{{ rupiah($last_balance) }}</td>
                         @endif
                         <td class="text-right text-nowrap">
-                            <a href="{{ route('cashes.edit', $cash->id) }}" class="btn btn-sm btn-warning"><i
+                            <a href="{{ route('cashes.edit', $cash->id) }}?return_to={{ urlencode(Request::fullUrl()) }}" class="btn btn-sm btn-warning"><i
                                     class="far fa-edit"></i></a>
                             <form class="delete-form d-inline-block" action="{{ route('cashes.destroy', $cash->id) }}"
                                 method="post">

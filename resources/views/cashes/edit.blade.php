@@ -10,6 +10,7 @@
                     <form action="{{ route('cashes.update', $cash->id) }}" method="POST">
                         {{ csrf_field() }}
                         <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="return_to" value="{{ urldecode($_REQUEST['return_to']) }}">
                         <div class="form-group row">
                             <label for="cashbook_id" class="col-md-4 col-form-label text-md-right">Buku Kas</label>
                             <div class="col-md-4">

@@ -172,9 +172,11 @@ class CashController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
+        $return_to = $request->get('return_to');
+
         $cash->update($request->only(['cashbook_id', 'date', 'cash_type_id', 'amount', 'description']));
 
-        return redirect()->route('cashes.index');
+        return redirect($return_to ? $return_to : route('cashes.index') . '?cashbook_id=' . $cash->cashbook_id);
     }
 
     /**
@@ -187,7 +189,7 @@ class CashController extends Controller
     {
         $cash->delete();
 
-        return redirect()->route('cashes.index');
+        return redirect()->back();
     }
 
     public function excel(Request $request)
